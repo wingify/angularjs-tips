@@ -1,7 +1,181 @@
-# Angular Cheatsheet
+## Tips & Tricks
 
-## Thou art...
+#### 1. Running a code when you aren't sure whether it will be called from within angular context or outside it.
 
-## Credits
+```
+$scope.evalAsync(function () {
+    // Your code here.
+});
+```
 
-The awesome front-end folks at Wingify.
+Note: In case you are sure you are out of angular context, its better to call `$scope.$digest` after your code instead of using `$scope.$apply` because `$apply` will call `$digest` on `$rootScope` which is much heavier.
+
+#### 2. Check if a form is dirty or invalid from your controller.
+
+```
+// `formName` is value of name attribute of the form.
+// If form is dirty.
+if ($scope.formName.$dirty) {
+}
+
+// If form is invalid.
+if ($scope.formName.$invalid) {
+}
+```
+
+Note: The name attribute value of the form cannot be hyphenated as that becomes a JS variable.
+
+#### 3. Watching for changes in `name` of any user in a list of users:
+
+```
+$scope.watchCollection(
+	function watchFn() {
+		return $scope.users.map(function (user) {
+			return user.name;
+		});
+	}),
+	function watchListener() {
+		// Fired when name of any user changes.
+	}
+});
+```
+
+
+#### 4. Make a particular HTML section compile only after some asynchronous data is fetched:
+
+In Controller:
+```
+$http.get('data_endpoint').then(function () {
+	$scope.isDataFetched = true;
+})
+```
+
+In HTML:
+```
+<div ng-if="isDataFetched">
+	<!-- Some complex HTML that needs fetched data ->
+</div>
+```
+
+
+#### 5. Angular `copy` function copies the prototype properties of an object on the new object. BEWARE: If you watch such an object, you will probably get stuck in an infinite loop because `$digest` will always find the old and new objects different due to the abnormal behavior of `angular.copy`.
+
+```
+var obj = {a: 1};
+var obj1 = Object.create(obj);
+
+obj1.hasOwnProperty('a'); // Returns false
+
+var newCopy = angular.copy(obj1);
+newCopy.hasOwnProperty('a'); // Returns true. Property `a` is own the object itself now.
+
+```
+
+
+## Performance:
+
+#### 1. Use track by in ng-repeat expression to avoid re-rendering of compelete list:
+
+```
+<!-- Normal -->
+<li ng-repeat="item in items"></li>
+
+<!-- Better -->
+<li ng-repeat="item in items track by item.id"></li>
+
+```
+
+#### 2. Debounce the change in model to prevent watchers from firing too frequently (Angular 1.3):
+
+```
+<input type="text" name="userName"
+       ng-model="user.name"
+       ng-model-options="{ debounce: 300 }" /><br />
+```
+This will change model value only after staying idle for 300ms after the last change happened in input value.
+
+
+#### 3. If your page has too many watchers being used to display content which doesn't change with time, use [bindonce](https://github.com/Pasvaz/bindonce)
+.
+
+Adds one watcher for `user.name`:
+
+```
+Welcome to the app, {{user.name}}
+```
+
+Using bindonce, no watcher remains once `user.name` is available:
+
+```
+Welcome to the app, <span bo-text="user.name"></span>
+```
+
+Note: Angular 1.3 has a similar feature:
+
+#### 4. If you have a directive that is inside an ng-repeat, its `compile` function is called only once throughout the ng-repeat. So place your common code for directives in compile function so that it executes only once per ng-repeat loop.
+
+
+#### 5. Watching for an item change in a list:
+
+Bad - Watch with deep comparison creates copies of objects:
+```
+$scope.watch('yourList',
+	function watchListener() {
+		// Fired when name of any user changes.
+	}
+}, true);
+```
+
+Good:
+```
+$scope.watchCollection('yourList',
+	function watchListener() {
+		// Fired when name of any user changes.
+	}
+});
+```
+
+#### 6. Avoid using filters on large arrays. Filters run on each digest loop and creates new array everytime it runs. In such cases its better to manually watch your list and do filtering when a change is detected.
+
+Bad - Filter runs on each digest loop.
+
+```
+<li ng-repeat="item in items | myComplexSortFilter"></li>
+```
+
+Good:
+
+In Controller:
+```
+$scope.filteredItems = $scope.items;
+$scope.$watchCollection('items', function () {
+    // Apply filter on change detection
+    $scope.filteredItems = myComplexFilter($scope.items);
+});
+```
+
+In HTML:
+```
+<li ng-repeat="item in newitemsList | myComplexSortFilter"></li>
+```
+
+## Debugging:
+
+#### 1. Many a times you want to know when an object's particular property gets set. Here is a neat trick to do it:
+
+```
+var obj = {a: 2};
+
+var _a = obj.a;
+
+Object.defineProperty(a, 'a', {
+ get: function () { return _a; },
+ set: function (val) { _a = val; console.log('prop changed'); }
+});
+
+// You'll get a console log whenever the property changes.
+```
+
+### Credits
+
+The awesome front-end folks at ![Wingify](http://wingify.com/images/logo_wingify_big.png)
