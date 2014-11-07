@@ -176,6 +176,13 @@ Object.defineProperty(a, 'a', {
 // You'll get a console log whenever the property changes.
 ```
 
+### Contributing
+- - -
+
+If you have some Angular tips and tricks you would like to get added here, please open pull request for the same.
+
+
 ### Credits
+- - -
 
 The awesome front-end folks at ![Wingify](http://wingify.com/images/logo_wingify_big.png)
