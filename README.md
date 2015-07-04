@@ -156,7 +156,7 @@ $scope.$watchCollection('items', function () {
 
 In HTML:
 ```html
-<li ng-repeat="item in newitemsList | myComplexSortFilter"></li>
+<li ng-repeat="item in newitemsList"></li>
 ```
 
 ## Debugging:
