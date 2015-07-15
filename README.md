@@ -2,7 +2,7 @@
 
 #### 1. Running a code when you aren't sure whether it will be called from within angular context or outside it.
 
-```
+```javascript
 $scope.evalAsync(function () {
     // Your code here.
 });
@@ -12,7 +12,7 @@ Note: In case you are sure you are out of angular context, its better to call `$
 
 #### 2. Check if a form is dirty or invalid from your controller.
 
-```
+```javascript
 // `formName` is value of name attribute of the form.
 // If form is dirty.
 if ($scope.formName.$dirty) {
@@ -27,7 +27,7 @@ Note: The name attribute value of the form cannot be hyphenated as that becomes 
 
 #### 3. Watching for changes in `name` of any user in a list of users:
 
-```
+```javascript
 $scope.watchCollection(
 	function watchFn() {
 		return $scope.users.map(function (user) {
@@ -44,23 +44,23 @@ $scope.watchCollection(
 #### 4. Make a particular HTML section compile only after some asynchronous data is fetched:
 
 In Controller:
-```
+```javascript
 $http.get('data_endpoint').then(function () {
 	$scope.isDataFetched = true;
 })
 ```
 
 In HTML:
-```
+```html
 <div ng-if="isDataFetched">
-	<!-- Some complex HTML that needs fetched data ->
+	<!-- Some complex HTML that needs fetched data -->
 </div>
 ```
 
 
 #### 5. Angular `copy` function copies the prototype properties of an object on the new object. BEWARE: If you watch such an object, you will probably get stuck in an infinite loop because `$digest` will always find the old and new objects different due to the abnormal behavior of `angular.copy`.
 
-```
+```javascript
 var obj = {a: 1};
 var obj1 = Object.create(obj);
 
@@ -76,7 +76,7 @@ newCopy.hasOwnProperty('a'); // Returns true. Property `a` is own the object its
 
 #### 1. Use track by in ng-repeat expression to avoid re-rendering of compelete list:
 
-```
+```html
 <!-- Normal -->
 <li ng-repeat="item in items"></li>
 
@@ -87,7 +87,7 @@ newCopy.hasOwnProperty('a'); // Returns true. Property `a` is own the object its
 
 #### 2. Debounce the change in model to prevent watchers from firing too frequently (Angular 1.3):
 
-```
+```html
 <input type="text" name="userName"
        ng-model="user.name"
        ng-model-options="{ debounce: 300 }" /><br />
@@ -106,7 +106,7 @@ Welcome to the app, {{user.name}}
 
 Using bindonce, no watcher remains once `user.name` is available:
 
-```
+```html
 Welcome to the app, <span bo-text="user.name"></span>
 ```
 
@@ -118,7 +118,7 @@ Note: Angular 1.3 has a similar feature:
 #### 5. Watching for an item change in a list:
 
 Bad - Watch with deep comparison creates copies of objects:
-```
+```javascript
 $scope.watch('yourList',
 	function watchListener() {
 		// Fired when name of any user changes.
@@ -127,7 +127,7 @@ $scope.watch('yourList',
 ```
 
 Good:
-```
+```javascript
 $scope.watchCollection('yourList',
 	function watchListener() {
 		// Fired when name of any user changes.
@@ -139,14 +139,14 @@ $scope.watchCollection('yourList',
 
 Bad - Filter runs on each digest loop.
 
-```
+```html
 <li ng-repeat="item in items | myComplexSortFilter"></li>
 ```
 
 Good:
 
 In Controller:
-```
+```javascript
 $scope.filteredItems = $scope.items;
 $scope.$watchCollection('items', function () {
     // Apply filter on change detection
@@ -155,7 +155,7 @@ $scope.$watchCollection('items', function () {
 ```
 
 In HTML:
-```
+```html
 <li ng-repeat="item in newitemsList | myComplexSortFilter"></li>
 ```
 
@@ -163,7 +163,7 @@ In HTML:
 
 #### 1. Many a times you want to know when an object's particular property gets set. Here is a neat trick to do it:
 
-```
+```javascript
 var obj = {a: 2};
 
 var _a = obj.a;
